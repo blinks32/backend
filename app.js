@@ -39,20 +39,13 @@ app.post('/generate', async (req, res) => {
     const combinedPrompt = `${context}\n\n${prompt}`;
     const result = await model.generateContent(combinedPrompt);
 
-    // Log the result for inspection
-    console.log('Model Result:', result);
-
-    if (result && result.response && result.response.text) {
-      res.json({ text: result.response.text });
-    } else {
-      res.json({ text: 'No text generated' });
-    }
+    // Send the full result object to the frontend
+    res.json({ fullResponse: result });
   } catch (error) {
     console.error('Error generating content:', error);
     res.status(500).send(error.message);
   }
 });
-
 
 app.post('/generate-image', authenticateToken, async (req, res) => {
   const { prompt } = req.body;
@@ -60,8 +53,8 @@ app.post('/generate-image', authenticateToken, async (req, res) => {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const result = await model.generate({ prompt, output: 'image' });
 
-    // Return the entire result for debugging purposes
-    res.json({ image: result?.image || 'No image generated', debug: result });
+    // Send the full result object to the frontend
+    res.json({ fullResponse: result });
   } catch (error) {
     console.error('Error generating image:', error);
     res.status(500).send(error.message);
