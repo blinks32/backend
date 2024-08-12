@@ -7,7 +7,13 @@ require('dotenv').config();
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: 'https://my-website-91lv.vercel.app', // your Vercel site
+  methods: 'GET,POST', // methods you want to allow
+  allowedHeaders: 'Content-Type,Authorization', // headers you want to allow
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(bodyParser.json());
 
