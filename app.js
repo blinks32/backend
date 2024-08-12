@@ -6,11 +6,13 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
 
 const app = express();
+const port = process.env.PORT || 3000; // Ensure the port is defined
 
 const corsOptions = {
-  origin: 'https://my-website-91lv.vercel.app', // your Vercel site
-  methods: 'GET,POST', // methods you want to allow
-  allowedHeaders: 'Content-Type,Authorization', // headers you want to allow
+  origin: 'https://my-website-91lv.vercel.app',
+  methods: 'GET,POST',
+  allowedHeaders: 'Content-Type,Authorization',
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
@@ -19,7 +21,6 @@ app.use(bodyParser.json());
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
-// JWT Middleware to authenticate token
 function authenticateToken(req, res, next) {
   const token = req.headers['authorization'];
   if (!token) return res.sendStatus(401);
@@ -31,15 +32,13 @@ function authenticateToken(req, res, next) {
   });
 }
 
-
 app.post('/generate', async (req, res) => {
   const { context, prompt } = req.body;
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const combinedPrompt = `${context}\n\n${prompt}`;
     const result = await model.generateContent(combinedPrompt);
-    const response = await result.response;
-    const text = await response.text();
+    const text = await result.response.text();
     res.json({ text });
   } catch (error) {
     console.error('Error:', error);
@@ -47,19 +46,12 @@ app.post('/generate', async (req, res) => {
   }
 });
 
-// Image generation endpoint
 app.post('/generate-image', authenticateToken, async (req, res) => {
   const { prompt } = req.body;
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    
-    // Hypothetical image generation method - adjust as per actual API documentation
-    const result = await model.generate({
-      prompt: prompt,
-      output: 'image' // Specify you want an image
-    });
-
-    const image = result.response; // Adjusted to access the correct field
+    const result = await model.generate({ prompt, output: 'image' });
+    const image = result.response; // Adjust this according to the API's response structure
 
     res.json({ image });
   } catch (error) {
@@ -69,5 +61,5 @@ app.post('/generate-image', authenticateToken, async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on`);
+  console.log(`Server running on port ${port}`);
 });
