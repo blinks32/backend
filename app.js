@@ -38,10 +38,16 @@ app.post('/generate', async (req, res) => {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const combinedPrompt = `${context}\n\n${prompt}`;
     const result = await model.generateContent(combinedPrompt);
-    const text = await result.response.text();
+    
+    // Log the result to debug response structure
+    console.log(result); 
+
+    // Assuming the structure might need adjustment
+    const text = result.response?.text || 'No text generated';
+    
     res.json({ text });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error generating content:', error); 
     res.status(500).send(error.message);
   }
 });
@@ -51,8 +57,13 @@ app.post('/generate-image', authenticateToken, async (req, res) => {
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const result = await model.generate({ prompt, output: 'image' });
-    const image = result.response; // Adjust this according to the API's response structure
-
+    
+    // Log the result to debug response structure
+    console.log(result); 
+    
+    // Assuming the structure might need adjustment
+    const image = result.response?.image || 'No image generated';
+    
     res.json({ image });
   } catch (error) {
     console.error('Error generating image:', error);
