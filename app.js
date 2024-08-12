@@ -6,7 +6,6 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
 
 const app = express();
-const port = 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -64,5 +63,5 @@ app.post('/generate-image', authenticateToken, async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server running on`);
 });
